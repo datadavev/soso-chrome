@@ -1,7 +1,7 @@
 import gulp from 'gulp'
 import { clean, scripts, styles, markup, images, manifest, watch, bundle } from './tasks'
 import dotenv from 'dotenv'
-dotenv.config()
+dotenv.config();
 
 
 export const paths = {
@@ -10,12 +10,13 @@ export const paths = {
     'src/content.js',
     'src/background.js',
     'src/popup.js',
+    'src/editor.js'
   ],
 
   styles: [
     'src/options.scss',
-    'src/popup.scss',
-    'node_modules/codemirror/lib/codemirror.css'
+    'src/editor.scss',
+    'node_modules/codemirror/lib/codemirror.css',
   ],
 
   images: 'src/images/**/*',
@@ -24,11 +25,11 @@ export const paths = {
 
   markup: [
     'src/options.html',
-    'src/popup.html',
+    'src/editor.html'
   ],
-}
+};
 
 
-gulp.task('build', gulp.series(clean, gulp.parallel(scripts, styles, markup, images, manifest)))
-gulp.task('dev', gulp.series('build', watch))
-gulp.task('bundle', gulp.series('build', bundle))
+gulp.task('build', gulp.series(clean, gulp.parallel(scripts, styles, markup, images, manifest)));
+gulp.task('dev', gulp.series('build', watch));
+gulp.task('bundle', gulp.series('build', bundle));

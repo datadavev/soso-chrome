@@ -1,23 +1,25 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Popup</title>
-  <link rel="stylesheet" href="popup.css">
+  <meta charset="UTF-8">
+  <title>Edit JSON-LD</title>
   <link rel="stylesheet" href="codemirror.css">
-  <script src="popup.js"></script>
+  <link rel="stylesheet" href="editor.css">
+  <script src="editor.js"></script>
 </head>
 <body>
+<div class="container">
 <div>
   <pre>URL: <span id="v_url">url</span></pre>
+  <pre>Note: <span id="v_note"></span></pre>
   <pre>Status: <span id="v_status">waiting...</span></pre>
   <pre id="validation_result"></pre>
 </div>
 
 <div id="src_edit">
   <pre>Source JSON-LD:<button id="bt_validate" disabled="true">Validate</button></pre>
-  <pre>Open JSON-LD:<button id="bt_open_jsonld" disabled="true">Open</button></pre>
   <textarea id="jsonld_text"></textarea>
+</div>
 </div>
 </body>
 </html>
