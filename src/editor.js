@@ -16,8 +16,6 @@ async function validateJsonLD(jsonld_txt) {
   let db = new PouchDB('tangram')
   let config = await(db.get('tangram_config'))
 
-  //let _background = browser.extension.getBackgroundPage()
-  //let config = _background.getTangramConfig()
   console.log("Service URL= " + config.service_url)
   const url = config.service_url
   // create form data for sending MIME/multipart
@@ -31,7 +29,6 @@ async function validateJsonLD(jsonld_txt) {
   console.log("data blob created")
   formdata.append("dg", dg)
   // set the shapegraph
-  //let sg = _background.getShaclShape()
   let sg = await db.getAttachment('tangram_config','shacl.ttl')
   console.log("shape blob created")
   formdata.append("sg", sg)

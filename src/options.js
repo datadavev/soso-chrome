@@ -1,20 +1,15 @@
 import browser from 'webextension-polyfill'
-//import initSimpleSettings from './lib/simple-settings'
 
 var saveConfig = null;
 
 async function saveOption(e) {
   const optionNode = e.currentTarget;
   const optionKey = optionNode.name;
-
   const optionValue = optionNode.type === 'checkbox' ? optionNode.checked : optionNode.value;
-
-  //browser.storage.sync.set({ [optionKey]: optionValue })
   let config = {};
   config[optionKey] = optionValue;
   console.log(config)
   await saveConfig(config);
-  //console.log(browser.storage.sync.get(null))
 }
 
 

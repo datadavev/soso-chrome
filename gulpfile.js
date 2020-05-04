@@ -9,7 +9,6 @@ export const paths = {
     'src/options.js',
     'src/content.js',
     'src/background.js',
-    'src/popup.js',
     'src/editor.js'
   ],
 
