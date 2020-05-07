@@ -44,9 +44,12 @@ async function extractJsonLD() {
         jsonld_texts.push(html_text);
         try {
           let json_obj = JSON.parse(html_text);
-          let expanded = await jsonld.expand(json_obj);
-          dataset_count += countDatasets(expanded);
-          expanded_jsonld.push(expanded);
+          // the jsonld expansion is a problem as it tends to make calls to external resources
+          // that cause security violations since the resources requested may be over a different protocol.
+          //let expanded = await jsonld.expand(json_obj);
+          //dataset_count += countDatasets(expanded);
+          //expanded_jsonld.push(expanded);
+          expanded_jsonld.push(null);
         } catch(err) {
           console.log(err);
           expanded_jsonld.push(null);
@@ -67,12 +70,24 @@ browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       });
     if (request.operation ==='get_json_count') {
       if (!the_jsonld_texts) {
-        //await extractJsonLD();
+        extractJsonLD().then(function(){
+          try {
+            sendResponse({
+              tab_id: request.tab_id,
+              json_count: the_jsonld_texts.length,
+              dataset_count: dataset_count
+            })
+          } catch(e) {
+            console.log(e)
+          }
+
+        });
       }
       try {
         sendResponse({
           tab_id: request.tab_id,
-          json_count: the_jsonld_texts.length
+          json_count: the_jsonld_texts.length,
+          dataset_count: dataset_count
         })
       } catch(e) {
         console.log(e)

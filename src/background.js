@@ -18,7 +18,7 @@ function initializeConfiguration() {
     'service_url': 'https://8m86jksvx8.execute-api.us-east-1.amazonaws.com/dev/verify',
     'shacl_url': 'https://raw.githubusercontent.com/datadavev/science-on-schema.org/2020-SOSOV/validation/shapes/soso_common.ttl',
     'report_format': 'human',
-    'external_report_window': true
+    'external_report_window': false
   }
   _config.put(bootstrap_config, function(err, result) {
     if (!err) {
@@ -69,6 +69,15 @@ async function loadShaclShape() {
   request.send()
 }
 
+// TODO: Something is up with the toggling, unreliable.
+function useExternalPopup(is_external) {
+  let detail = {popup:'editor.html'};
+  if (is_external) {
+    detail.popup = '';
+  }
+  browser.browserAction.setPopup(detail)
+}
+
 
 async function updateConfiguration(config) {
   let doc = await getTangramConfig()
@@ -77,13 +86,7 @@ async function updateConfiguration(config) {
   _config.put(doc).then(function(result) {
     console.log(result);
     console.log(doc);
-    if (doc.external_report_window) {
-      // disable popup
-      browser.browserAction.setPopup({popup:null});
-    } else {
-      //enable popup with editor.html
-      browser.browserAction.setPopup({popup:'editor.html'});
-    }
+    useExternalPopup(doc.external_report_window);
   }).catch(function(err) {
     console.log('Problem updating tangram configuration:')
     console.log(err)
@@ -96,7 +99,9 @@ browser.runtime.onInstalled.addListener(async function() {
   // called when extension is installed
   // https://developer.chrome.com/extensions/runtime#event-onInstalled
   console.log('browser.runtime.onInstalled.addListener')
-    await initializeConfiguration()
+  await initializeConfiguration()
+  let doc = await getTangramConfig()
+  useExternalPopup(doc.external_report_window);
   //await updateConfiguration({service_url:'https://8m86jksvx8.execute-api.us-east-1.amazonaws.com/dev/verify'})
   await loadShaclShape()
 })
@@ -154,8 +159,14 @@ function isTangramOpen() {
 
 function updateBadgeWithJsonCount(msg) {
   console.log('JSONLD Count: ',msg);
+  if (msg.json_count > 0) {
+    browser.browserAction.setBadgeBackgroundColor({
+      'tabId': msg.tab_id,
+      'color':'#00B946'
+    })
+  }
   browser.browserAction.setBadgeText({
-    'text':msg.json_count.toString(),
+    'text':msg.dataset_count.toString(),
     'tabId':msg.tab_id
   });
 }
@@ -211,8 +222,16 @@ browser.tabs.onUpdated.addListener(async function(tab_id, change_info, tab_info)
 
 async function doUpdateTangramWindow(){
   // request content from the content.js
+  let _tabid = null
   try {
-    let response = await browser.tabs.sendMessage(the_tab.id, {operation: 'get_jsonld'});
+    _tabid = the_tab.id;
+  } catch(e) {
+    let caller = await browser.tabs.query({active: true, currentWindow: true});
+    the_tab = caller[0];
+    _tabid = the_tab.id;
+  }
+  try {
+    let response = await browser.tabs.sendMessage(_tabid, {operation: 'get_jsonld'});
     console.log("sendMessage response = ", response);
     _jsondata.url = response.url;
     _jsondata.json = response.jsonld;
