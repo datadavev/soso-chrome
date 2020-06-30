@@ -6,16 +6,20 @@ dotenv.config();
 
 export const paths = {
   scripts: [
+    'src/common.js',
     'src/options.js',
     'src/content.js',
     'src/background.js',
-    'src/editor.js'
+    'src/popup.js'
   ],
 
   styles: [
     'src/options.scss',
-    'src/editor.scss',
+    'src/popup.scss',
     'node_modules/codemirror/lib/codemirror.css',
+    'node_modules/spectre.css/dist/spectre.css',
+    'node_modules/spectre.css/dist/spectre-exp.css',
+    'node_modules/spectre.css/dist/spectre-icons.css',
   ],
 
   images: 'src/images/**/*',
@@ -24,7 +28,7 @@ export const paths = {
 
   markup: [
     'src/options.html',
-    'src/editor.html'
+    'src/popup.html'
   ],
 };
 
@@ -32,3 +36,4 @@ export const paths = {
 gulp.task('build', gulp.series(clean, gulp.parallel(scripts, styles, markup, images, manifest)));
 gulp.task('dev', gulp.series('build', watch));
 gulp.task('bundle', gulp.series('build', bundle));
+gulp.task('clean', gulp.series(clean));

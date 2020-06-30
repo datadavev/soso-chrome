@@ -1,2 +1,15 @@
+@import 'spectre.css';
+@import 'spectre-exp.css';
+@import 'spectre-icons.css';
+
 html {
+  font-size: 1.0em;
+}
+
+body {
+    width: 800px;
+}
+
+pre.code {
+  font-size: 0.8rem;
 }

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LD Viewer</title>
+  <link rel="stylesheet" href="popup.css">
+  <script src="popup.js"></script>
+</head>
+<body>
+<div class="container">
+<div id="jsonld_view" class="columns page-height">
+  <div id="jsonld_sources" class="column col-12">
+    <template x-for="g in blocks">
+      <div class="card">
+        <div class="card-header">
+          <template x-for="t in g.basicInfo">
+            <div>
+            <span class="chip" x-text="t.type"></span>
+            <span class="card-title h5" x-text="t.name"></span>
+              </div>
+          </template>
+        </div>
+        <div class="card-body">
+          <pre class="code" data-lang="JSON-LD"><span x-bind:id="g.global_block_id + '_copy'" class="c-hand" title="Copy JSON-LD to clipboard"><i class="icon icon-copy text-dark"></i></span>&nbsp;&nbsp;<span x-bind:id="g.global_block_id + '_edit'" class="c-hand" title="Open JSON-LD in Tangram editor"><i class="icon icon-share text-dark"></i></span>
+            <code x-bind:id="g.global_block_id" x-text="g.dataText"></code>
+          </pre>
+        </div>
+      </div>
+    </template>
+  </div>
+</div>
+</div>
+</body>
+</html>
+

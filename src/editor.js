@@ -1,20 +1,196 @@
 import browser from 'webextension-polyfill'
+import Alpine from 'alpinejs';
 import CodeMirror from 'codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/elegant.css'
 import 'codemirror/mode/javascript/javascript'
 import 'codemirror/addon/edit/closebrackets'
+import 'regenerator-runtime/runtime.js';
 import PouchDB from "pouchdb";
 import jsonld from 'jsonld';
 
-var code_mirror = null;
-const jld_frame = {};
 
-console.log("jsonld frame: ", jsonld.frame);
+var code_mirror = null;
+
+const schema_org_http_match = /^http:\/\/schema\.org\//gi;
+const schema_org_https_match = /^https:\/\/schema\.org\//gi;
+
+const ds_frame = {
+  "@context":{
+    "@vocab":"https://schema.org/"
+  },
+  "@type":["Dataset"],
+  "name":{},
+  "description":{},
+  "url":{},
+  "identifier":{}
+};
+
+/*
+List of one per block:
+{
+  text: text source
+  parsed: parsed data block
+  framed: framed parsed data block
+  report: validation report
+  report_framed: validation report framed
+}
+ */
+
+class DataBlock{
+  constructor(text) {
+    this.text = text;
+    this.data = null;
+    this.expanded = null;
+    this.framed = null;
+    this._namespace = null;
+    this._editor = null;
+  }
+
+  async parse() {
+    if (this.text === null) {
+      return null;
+    }
+    return new Promise(resolve =>{
+      try {
+        this.data = JSON.parse(this.text);
+        resolve(this.data);
+      } catch(e) {
+        this.data = null;
+        resolve(this.data);
+      }
+    });
+  }
+
+  async getNamespace(){
+    if (this._namespace !== null) {
+      return this._namespace;
+    }
+    if (!this.expanded) {
+      await this.expand();
+    }
+    this._namespace = "";
+    for (let ig=0; ig<this.expanded.length; ig++){
+      for (let k in this.expanded[ig]) {
+        if (this.expanded[ig].hasOwnProperty(k)) {
+          console.debug("K = ",k);
+          if (k.match(schema_org_http_match)) {
+            this._namespace = "http://schema.org/";
+            return this._namespace;
+          }
+          if (k.match(schema_org_https_match)) {
+            this._namespace = "https//schema.org/";
+            return this._namespace;
+          }
+        }
+      }
+    }
+    return this._namespace;
+  }
+
+  async expand() {
+    if (!this.data) {
+      console.error("No parsed data available to expand");
+      return null;
+    }
+    this.expanded = await jsonld.expand(this.data);
+    return this.expanded;
+  }
+
+  async frame(json_frame) {
+    if (!this.data) {
+      console.error("No parsed data available to frame");
+      return null
+    }
+    if (this._namespace === 'http://schema.org/') {
+        json_frame['@context']['@vocab'] = 'http://schema.org/';
+      }
+    this.framed = await jsonld.frame(this.data, json_frame, {omitGraph:false});
+    return this.framed;
+  }
+
+  getName() {
+    //TODO: a graph may have more than one dataset
+    try {
+      return this.framed["@graph"][0].name;
+    } catch(e) {
+      console.error(e);
+      console.error("Problem getting name for ", this);
+    }
+    return "Not Available";
+  }
+
+  getDescription() {
+    try {
+      return this.framed["@graph"][0].description;
+    } catch(e) {
+      console.error(e);
+      console.error("Problem getting description for ", this);
+    }
+    return "Description Not Available";
+  }
+
+  async validate(shape_graph) {
+  }
+
+  updateAfterEdit() {
+
+  }
+
+  getEditor(ele) {
+    if (this.editor !== null){
+      return this.editor;
+    }
+    this.editor = CodeMirror.fromTextArea(
+      ele,{
+        matchBrackets: true,
+        autoCloseBrackets: true,
+        mode: 'application/ld+json',
+        lineNumbers: true,
+        lineWrapping: true
+      });
+    return this.editor;
+  }
+}
+
+var page_data_blocks = {
+  _dummy: 0,
+  baseURI:null,
+  blocks:[],
+  dataSets() {
+    return this.blocks;
+  },
+  async frameAll(data_frame, cb) {
+    let promises = [];
+    for (let i=0; i<this.blocks.length; i++){
+      await this.blocks[i].getNamespace();
+      promises.push(this.blocks[i].frame(data_frame));
+    }
+    Promise.all(promises).then(cb);
+  }
+};
+window.page_data_blocks = page_data_blocks;
+
+function updateUI(){
+  var ele = document.getElementById('dataset_view');
+  ele.__x.$data._dummy += 1;
+}
+
+var page_data = {
+  baseURI:null,
+  text:[],
+  parsed: [],
+  is_https: [],
+  types: [],
+  framed: [],
+  reports:[],
+  reports_framed:[],
+};
+window.page_data = page_data;
 
 async function validateJsonLD(jsonld_txt) {
-  let db = new PouchDB('tangram')
-  let config = await(db.get('tangram_config'))
+  let db = new PouchDB('tangram');
+  let config = await(db.get('tangram_config'));
 
   console.log("Service URL= " + config.service_url)
   const url = config.service_url
@@ -121,22 +297,129 @@ function setJsonLD(url, jsonld) {
   bt_validate.onclick = doValidation;
 }
 
+async function detectNamespace(data) {
+  console.log("detectNamespace 1");
+  let edata = await jsonld.expand(data);
+  let ns = '';
+  console.log("detectNamespace 2");
+  for (let ig=0; ig<edata.length; ig++){
+    for (let k in edata[ig]) {
+      if (edata[ig].hasOwnProperty(k)) {
+        console.debug("K = ",k);
+        if (k.match(schema_org_http_match)) {
+          return "http://schema.org/";
+        }
+        if (k.match(schema_org_https_match)) {
+          return "https//schema.org/";
+        }
+      }
+    }
+  }
+  return ns;
+}
+
+async function parseData(text){
+  return new Promise(resolve =>{
+    try {
+      let parsed = JSON.parse(text);
+      resolve(parsed);
+    } catch(e) {
+      resolve(null);
+    }
+  });
+}
+
+async function parsePageData(){
+  let promises = [];
+  for (let ib=0; ib < page_data.text.length; ib++){
+    promises.push(parseData(page_data.text[ib]));
+  }
+  page_data.parsed = await Promise.all(promises);
+}
+
+async function framePageData(){
+  //Assumes page_data has been populated.
+  console.debug("page data: ", page_data);
+  let promises = [];
+  for (let ib=0; ib<page_data.parsed.length; ib++){
+    if (page_data.parsed[ib]) {
+      console.debug("Framing: ", page_data.parsed[ib]);
+      let d_frame = ds_frame;
+      if (!page_data.is_https[ib]) {
+        d_frame['@context']['@vocab'] = 'http://schema.org/';
+      }
+      promises.push(jsonld.frame(page_data.parsed[ib], d_frame, {omitGraph:false}));
+    } else {
+      console.debug("Skip framing for: ", page_data.parsed[ib]);
+      promises.push({})
+    }
+  }
+  const results = await Promise.all(promises);
+  for (let ib=0; ib < results.length; ib ++){
+    page_data.framed[ib] = results[ib];
+  }
+  console.info("Framing completed: ",page_data.framed);
+}
 
 window.onload = async function() {
 
   // Listen for message to update the json_ld for validation
   browser.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    if (request.operation === 'set_jsonld')
-      setJsonLD(request.url, request.jsonld);
-      sendResponse({
-        status: 'OK'
-      });
+    console.log("editor.js onMessage: ", request);
   });
 
   // Notify backend that the editor window is ready
   browser.runtime.sendMessage({
-    operation:'tangram_ready'
-  })
-}
+    name:'tangram_popup_ready'
+  });
+
+  // Notify content that we're ready
+  browser.tabs.query({active:true, currentWindow:true}).then(function(tabs){
+    Alpine.start();
+    browser.tabs.sendMessage(tabs[0].id, {name:'get_json'}).then(function(response){
+      console.log("Response to popup from tab get_json: ", response);
+      page_data_blocks.baseURI = response.baseURI;
+
+      let promises = [];
+      for (let ib=0; ib < response.blocks.length; ib++){
+        let block = new DataBlock(response.blocks[ib].text);
+        page_data_blocks.blocks.push(block);
+        promises.push(block.parse());
+      }
+      Promise.all(promises).then(function(){
+        console.log("Loaded data:", page_data_blocks);
+        page_data_blocks.frameAll(ds_frame, updateUI);
+        console.log("Data framed");
+      })
+      /*
+      page_data.baseURI = response.baseURI;
+      for (let ib=0; ib < response.blocks.length; ib++){
+        page_data.text.push(response.blocks[ib].text);
+        page_data.parsed.push(response.blocks[ib].parsed);
+        page_data.types.push(response.blocks[ib].types);
+        page_data.framed.push(null);
+        page_data.reports.push(null);
+        page_data.reports_framed.push(null);
+        let is_https = true;
+        for (let tt in page_data.types[ib]) {
+          if (page_data.types[ib].hasOwnProperty(tt)){
+            console.debug('type = ',tt);
+            if (tt.match(schema_org_http_match)){
+              is_https = false;
+              break;
+            }
+          }
+        }
+        page_data.is_https.push(is_https);
+        detectNamespace(page_data.parsed[ib]).then(function(res){
+          console.log("detected namespace = ", res);
+        });
+      }
+      setTimeout(framePageData, 10);
+
+       */
+    });
+  });
+};
 
