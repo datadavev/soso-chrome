@@ -9,17 +9,21 @@
 </head>
 <body>
 <div class="container">
-<div>
-  <pre>URL: <span id="v_url">url</span></pre>
-  <pre>Note: <span id="v_note"></span></pre>
-  <pre>Status: <span id="v_status">waiting...</span></pre>
-  <pre id="validation_result"></pre>
-</div>
-
-<div id="src_edit">
-  <pre>Source JSON-LD:<button id="bt_validate" disabled="true">Validate</button></pre>
-  <textarea id="jsonld_text"></textarea>
-</div>
+  <div id="dataset_view" x-data="window.page_data_blocks">
+    <span x-text="_dummy" x-show="false"></span>
+    <template x-for="g in window.page_data_blocks.dataSets()">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title h5">Dataset</div>
+          <div class="card-subtitle"><span x-text="g.getName()"></span></div>
+        </div>
+        <div class="card-body">
+          <p x-html="g.getDescription()"></p>
+          <textarea x-text="g.text"></textarea>
+        </div>
+      </div>
+    </template>
+  </div>
 </div>
 </body>
 </html>

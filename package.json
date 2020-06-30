@@ -15,6 +15,7 @@
     "build": "NODE_ENV=production gulp build --require esm",
     "bundle": "NODE_ENV=production gulp bundle --require esm",
     "pretest": "npm run build",
+    "clean": "NODE_ENV=development gulp clean --require esm",
     "test": "ava"
   },
   "browserslist": [
@@ -25,12 +26,14 @@
     "node": ">=8.6"
   },
   "dependencies": {
+    "alpinejs": "^2.3.3",
     "codemirror": "^5.52.2",
     "core-js": "^3.6.5",
     "css-loader": "^3.5.2",
-    "jsonld": "^3.1.0",
+    "jsonld": "^3.1.1",
     "lz-string": "^1.4.4",
     "pouchdb": "^7.2.1",
+    "spectre.css": "^0.5.8",
     "webextension-polyfill": "^0.4.0"
   },
   "devDependencies": {

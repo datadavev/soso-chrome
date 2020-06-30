@@ -1,0 +1,30 @@
+@startuml
+participant jsonlddata
+participant content
+participant background
+participant popup
+[-> content: window.onload
+activate content
+content -> jsonlddata **: loadData
+jsonlddata -> jsonlddata: parse jsonld
+jsonlddata --> content: ready
+content -> background: content_ready
+deactivate content
+background -> content: get_json_count
+content --> background: msg
+background -> background: updateBadgeWithJsonCount
+@enduml
+
+@startuml
+
+class JSBlock {
+  data: Object
+  rdf: Object
+  frames: {name: Object, ...}
+}
+
+class JSData {
+  blocks: [{data:Object, rdf:Object, frames:{frame_name: Object} }, ...]
+  types: [{name: count}, ...]
+}
+@enduml

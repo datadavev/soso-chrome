@@ -1,92 +1,124 @@
+/*
+Content page for extension.
+Single instance of this page per web browser tab.
+ */
+
 import browser from 'webextension-polyfill'
-import jsonld from 'jsonld';
+import JsonLdBlock from 'common';
+/*
+ Mutation watcher - watch for selector match
+ */
+(function(win) {
+    'use strict';
 
-var the_jsonld_texts = null;
-var expanded_jsonld = null;
-var dataset_count = 0;
-const so_datasets = [
-  'https://schema.org/Dataset',
-  'http://schema.org/Dataset',
-  'https://schema.orgDataset',
-  'http://schema.orgDataset'
-]
+    var listeners = [],
+    doc = win.document,
+    MutationObserver = win.MutationObserver || win.WebKitMutationObserver,
+    observer;
 
-function countDatasets(json_obj){
-  let nd = 0;
-  for (var k in json_obj) {
-    if (k === '@type') {
-      // in expanded, this will always be an array
-      //console.log("types = ", json_obj[k]);
-      for (var v in json_obj[k]) {
-        //console.log("v = ", json_obj[k][v]);
-        if (so_datasets.includes(json_obj[k][v])) {
-          nd += 1;
-          console.log("Dataset found, nd = ", nd);
+    function ready(selector, fn) {
+        // Store the selector and callback to be monitored
+        listeners.push({
+            selector: selector,
+            fn: fn
+        });
+        if (!observer) {
+            // Watch for changes in the document
+            observer = new MutationObserver(check);
+            observer.observe(doc.documentElement, {
+                childList: true,
+                subtree: true
+            });
         }
-      }
-    } else if (typeof json_obj[k] === 'object' && json_obj[k] !== null) {
-      nd += countDatasets(json_obj[k])
+        // Check if the element is currently in the DOM
+        check();
     }
-  }
-  return nd;
-}
 
-async function extractJsonLD() {
-  var jsonld_texts = [];
-  expanded_jsonld = [];
-  var all_script = document.getElementsByTagName("script");
-  for (var i = 0; i < all_script.length; i++) {
-    if (all_script[i].hasAttribute('type') && all_script[i].getAttribute('type') == "application/ld+json") {
-      var html_text = all_script[i].innerHTML;
-      html_text = html_text.replace("//<![CDATA[","").replace("//]]","");
-      html_text = html_text.replace("<![CDATA[","").replace("]]>","");
-      if (html_text.length > 0) {
-        jsonld_texts.push(html_text);
-        try {
-          let json_obj = JSON.parse(html_text);
-          let expanded = await jsonld.expand(json_obj);
-          dataset_count += countDatasets(expanded);
-          expanded_jsonld.push(expanded);
-        } catch(err) {
-          console.log(err);
-          expanded_jsonld.push(null);
+    function check() {
+        // Check the DOM for elements matching a stored selector
+        for (var i = 0, len = listeners.length, listener, elements; i < len; i++) {
+            listener = listeners[i];
+            // Query for elements matching the specified selector
+            elements = doc.querySelectorAll(listener.selector);
+            for (var j = 0, jLen = elements.length, element; j < jLen; j++) {
+                element = elements[j];
+                // Make sure the callback isn't invoked with the
+                // same element more than once
+                if (!element.ready) {
+                    element.ready = true;
+                    // Invoke the callback with the element
+                    listener.fn.call(element, element);
+                }
+            }
         }
-      }
     }
-  }
-  console.log("Found datasets: ", dataset_count);
-  the_jsonld_texts = jsonld_texts;
-  return jsonld_texts;
-}
 
-browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.operation === 'get_jsonld')
-      sendResponse({
-        url: document.location.href,
-        jsonld: the_jsonld_texts
+    // Expose `ready`
+    win.ready = ready;
+})(window);
+
+
+var loader_timeout = null;
+export var so_data_blocks = [];
+
+
+function initializeSOData() {
+  so_data_blocks = [];
+  ready("script[type=\"application/ld+json\"]", function(ele){
+    let block_id = "json_block_" + so_data_blocks.length;
+    let block = new JsonLdBlock(ele.innerText, block_id);
+    so_data_blocks.push(block);
+    block._parse().then(function() {
+        console.log("JSON: " + so_data_blocks.length + " blocks loaded.");
+        let n_blocks = so_data_blocks.length;
+        let n_datasets = 0;
+        so_data_blocks.forEach((b) => {n_datasets += b.numDatasets});
+        let msg = {
+          name:"json_data_changed",
+          n_blocks:n_blocks,
+          n_datasets:n_datasets
+        };
+        console.log(msg);
+        browser.runtime.sendMessage(msg);
       });
-    if (request.operation ==='get_json_count') {
-      if (!the_jsonld_texts) {
-        //await extractJsonLD();
-      }
-      try {
-        sendResponse({
-          tab_id: request.tab_id,
-          json_count: the_jsonld_texts.length
-        })
-      } catch(e) {
-        console.log(e)
-      }
-    }
   });
 
+}
+
+/*
+Responds to messages sent from background or popup.
+ */
+browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    console.debug('SOSO-content: received message: ', request);
+    if (request.name ==='content.load_jsonXX') {
+      //load the _tangram_data block
+      //That method will send a message when the load is completed
+      if (loader_timeout !== null) {
+        clearTimeout(loader_timeout);
+        loader_timeout = null;
+      }
+      loader_timeout = setTimeout(function(){
+        loadJsonLdBlocks();
+      }, 500);
+      sendResponse({'status':'ok'});
+    }
+    if (request.name === 'get_blocks'){
+      console.debug("return promise for get_json_compact");
+      return Promise.resolve({
+        blocks: so_data_blocks
+      });
+    }
+    if (request.name === 'get_block'){
+      return Promise.resolve({
+        block: so_data_blocks[request.block_idx]
+      });
+    }
+
+});
+
+
 window.onload = async function() {
-  the_jsonld_texts = null;
-  // Notify after a couple seconds to allow some time for single page apps to do their thing.
-  setTimeout(function(){
-    extractJsonLD().then(
-      browser.runtime.sendMessage({
-        operation:'content_ready'
-      }));
-  }, 2000);
+  let test = new JsonLdBlock("{test:0}");
+
+  initializeSOData();
 };
