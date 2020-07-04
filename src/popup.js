@@ -2,6 +2,7 @@ import browser from 'webextension-polyfill';
 import Alpine from 'alpinejs';
 import JsonLdBlock from 'common';
 import Spectre from "../../tangram/src/web/static/lib/spectre.js";
+import {so_data_blocks} from "./content";
 
 function copyTextToClipboard(text) {
   var textArea = document.createElement("textarea");
@@ -28,6 +29,7 @@ function copyTextToClipboard(text) {
   document.body.removeChild(textArea);
 }
 
+var alpine_blocks = null;
 
 class AlpineBlockData {
   constructor(_id, _name, initialize=false) {
@@ -47,7 +49,8 @@ class AlpineBlockData {
   async initializeUI(){
     let ele = document.getElementById(this._id);
     ele.setAttribute('x-data', "window['" + this._name + "'].data");
-    ele.setAttribute('x-bind:_ticker', "_ticker");
+    //let ele_sources = document.getElementById('jsonld_sources');
+    //ele_sources.setAttribute('x-bind:_ticker', "_ticker");
     await Alpine.initializeComponent(ele);
     let elist = document.querySelectorAll("[id$='_copy']");
     for (var i=0; i < elist.length; i++) {
@@ -71,14 +74,20 @@ class AlpineBlockData {
         browser.runtime.sendMessage(msg);
       })
     }
-
   }
 
+  async validateBlocks() {
+    // Get the SHACL source
+    console.debug("popup validateBlocks");
+    let shacl = await window.getShaclShape();
+    console.log("SHACL = ", shacl);
+  }
 
 
   updateUI() {
     let ele = document.getElementById(this._id);
     ele.__x.$data._ticker += 1;
+    console.debug("updateUI, ticker=", this.data._ticker);
   }
 
   setV(p, v) {
@@ -89,6 +98,15 @@ class AlpineBlockData {
   addBlocks(blocks) {
     for (var i=0; i<blocks.length; i++) {
       this.data.blocks.push(new JsonLdBlock((blocks[i])));
+    }
+  }
+
+  setBlock(block) {
+    for (var i=0; i<this.data.blocks.length; i++) {
+      if (this.data.blocks[i].global_block_id === block.global_block_id) {
+        this.data.blocks[i].update(block);
+        this.updateUI();
+      }
     }
   }
 }
@@ -121,23 +139,27 @@ async function getJsonCompact(block_idx) {
 async function updateUI(ele_id){
   ele_id = ele_id || 'dataset_view';
   var ele = document.getElementById(ele_id);
-  await Alpine.initializeComponent(ele);
+  //await Alpine.initializeComponent(ele);
   console.debug(ele);
   ele.__x.$data._ticker += 1;
 }
 
+browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    console.debug('SOSO-popup: received message: ', request);
+    if (request.name === 'block_updated'){
+      alpine_blocks.setBlock(request.block);
+    }
+});
+
 window.onload = async function() {
   window.Alpine.start();
-  var db = new AlpineBlockData("jsonld_view", "data_blocks", false);
-  browser.tabs.query({active:true, currentWindow:true}).then(function(tabs){
-    browser.tabs.sendMessage(tabs[0].id, {name:'get_blocks'}).then(function(response){
-      db.addBlocks(response.blocks);
-      db.initializeUI();
-      //db.updateUI();
-    });
-    //browser.tabs.sendMessage(tabs[0].id, {name:'get_block', block_idx:0}).then(function(response){
-    //  let block = new JsonLdBlock(response.block);
-    //  console.log(block);
-    //});
+  alpine_blocks = new AlpineBlockData("jsonld_view", "data_blocks", false);
+  var tabs = await browser.tabs.query({active:true, currentWindow:true});
+  await browser.tabs.sendMessage(tabs[0].id, {name:'get_blocks'}).then(function(response){
+      alpine_blocks.addBlocks(response.blocks);
+      alpine_blocks.initializeUI();
+     });
+  browser.tabs.sendMessage(tabs[0].id, {name:'validate_blocks', tabId:tabs[0].id}).then(function(response){
+    console.debug("SHACL validation done.");
   });
 };

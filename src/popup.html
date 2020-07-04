@@ -9,24 +9,41 @@
 <body>
 <div class="container">
 <div id="jsonld_view" class="columns page-height">
-  <div id="jsonld_sources" class="column col-12">
+  <div id="jsonld_sources" class="column col-12" x-bind:ticker="_ticker">
     <template x-for="g in blocks">
       <div class="card">
         <div class="card-header">
           <template x-for="t in g.basicInfo">
             <div>
             <span class="chip" x-text="t.type"></span>
-            <span class="card-title h5" x-text="t.name"></span>
+            <span class="card-title h5" x-html="t.name"></span>
               </div>
           </template>
         </div>
-        <div class="card-body">
-          <pre class="code" data-lang="JSON-LD"><span x-bind:id="g.global_block_id + '_copy'" class="c-hand" title="Copy JSON-LD to clipboard"><i class="icon icon-copy text-dark"></i></span>&nbsp;&nbsp;<span x-bind:id="g.global_block_id + '_edit'" class="c-hand" title="Open JSON-LD in Tangram editor"><i class="icon icon-share text-dark"></i></span>
+        <div class="card-body"><!-- White space matters in the following line since it is a pre block -->
+          <pre class="code" data-lang="JSON-LD"><span x-bind:id="g.global_block_id + '_copy'" class="c-hand" title="Copy JSON-LD to clipboard"><i class="icon icon-copy text-dark"></i> Copy</span>&nbsp;&nbsp;<span x-bind:id="g.global_block_id + '_edit'" class="c-hand" title="Open JSON-LD in Tangram editor"><i class="icon icon-share text-dark"></i> Edit</span>&nbsp;&nbsp;<a x-show="g.validation" x-bind:href="'#' + g.global_block_id + '_report'"><span x-bind:id="g.global_block_id + '_valid'" class="c-hand" title="Validation report" x-bind:class="{'text-gray':g.valid<0, 'text-success':g.valid==1,'text-error':g.valid==0}"><i class="icon" x-bind:class="{'icon-cross':g.valid<1, 'icon-check':g.valid>=1}"></i> Validation</span></a>
             <code x-bind:id="g.global_block_id" x-text="g.dataText"></code>
+          </pre>
+          <pre x-show="g.validation" x-bind:id="g.global_block_id + '_report'" class="code" data-lang="Validation source">
+            <code x-text="g.validationReport">Loading...
+            </code>
           </pre>
         </div>
       </div>
     </template>
+  </div>
+  <div x-show="blocks.length===0" class="card">
+    <div class="card-header">
+      <div class="card-title h5">No JSON-LD found</div>
+    </div>
+    <div class="card-body">
+      <p>Visit <a href="" target="_new">Science on Schema.org</a> to learn how discoverability and access to
+        data can be improved through the use of JSON-LD metadata embedded in web pages.</p>
+      <p><a href="https://json-ld.org/" target="_new">JSON-LD</a> is a lightweight Linked Data format.</p>
+      <p><a href="https://schema.org/" target="_new">Schema.org</a> is a collaborative, community activity with a
+        mission to create, maintain, and promote schemas for structured data on the Internet, on web pages, in
+        email messages, and beyond.</p>
+    </div>
   </div>
 </div>
 </div>
