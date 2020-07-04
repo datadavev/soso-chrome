@@ -39,7 +39,20 @@ class AlpineBlockData {
     this.data = {
       _ticker: 0,
       blocks: [],
-      base_uri: ""
+      base_uri: "",
+      toggleSource: function(block_id, setto=null) {
+        for (var i=0; i<this.blocks.length; i++) {
+          if (this.blocks[i].global_block_id === block_id) {
+            if (setto === null) {
+              setto = ! this.blocks[i].show_source;
+            }
+            this.blocks[i].show_source = setto;
+            console.log("Show source toggle = ", this.blocks[i].show_source);
+            alpine_blocks.updateUI();
+            return;
+          }
+        }
+      }
     };
     if (initialize) {
       this.initializeUI();
@@ -75,14 +88,6 @@ class AlpineBlockData {
       })
     }
   }
-
-  async validateBlocks() {
-    // Get the SHACL source
-    console.debug("popup validateBlocks");
-    let shacl = await window.getShaclShape();
-    console.log("SHACL = ", shacl);
-  }
-
 
   updateUI() {
     let ele = document.getElementById(this._id);

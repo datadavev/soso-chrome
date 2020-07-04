@@ -132,8 +132,10 @@ async function validateBlocks() {
   const val_config = await browser.runtime.sendMessage({name:"get_validation_config"});
   const url = val_config.service_url + "verify";
   for (var i=0; i < so_data_blocks.length; i++){
-    if (!so_data_blocks[i]._validated) {
-      so_data_blocks[i].validate(url, val_config.shacl, val_config.options, updatePopupUI);
+    if (so_data_blocks[i].validation) {
+      if (!so_data_blocks[i]._validated) {
+        so_data_blocks[i].validate(url, val_config.shacl, val_config.options, updatePopupUI);
+      }
     }
   }
 }

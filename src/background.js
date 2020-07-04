@@ -40,7 +40,7 @@ function doInitializeConfiguration(data) {
     //'service_url': data.service.url,
     'service_url': "http://localhost:5000",
     'shacl_url': data.shacl.url,
-    'report_format': 'human',
+    'report_format': 'json-ld',
     'external_report_window': false
   };
   updateConfiguration(bootstrap_config);

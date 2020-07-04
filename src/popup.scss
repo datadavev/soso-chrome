@@ -7,9 +7,13 @@ html {
 }
 
 body {
-    min-width: 400px;
+    min-width: 600px;
 }
 
 pre.code {
   font-size: 0.8rem;
+}
+
+pre.code::before {
+  color: #303742;
 }

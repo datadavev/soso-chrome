@@ -65,12 +65,12 @@ const validation_report_frame = {
   "sh:failureCount":0,
   "sh:shapeCount":0,
   "sh:shapesApplied":0,
-  "sh:result":{
+  "sh:result":[{
     "@type":"sh:ValidationResult",
     "sh:resultSeverity":{},
     "sh:resultMessage":{"@value":{},"@language":"en"},
     "sh:focusNode":{}
-  }
+  }]
 };
 
 /*++++++++++++++++++++++++++++
@@ -94,6 +94,21 @@ const customLoader = async (url, options) => {
 jsonld.documentLoader = customLoader;
 /* -------------------------------- */
 
+function getTypes(g, typelist) {
+  for (var k in g) {
+    if (g.hasOwnProperty(k)) {
+      if (typeof g[k] == "object") {
+        getTypes(g[k], typelist);
+      } else {
+        if (k === "@type") {
+          console.debug("Found type = ", g[k]);
+          typelist.push(g[k]);
+        }
+      }
+    }
+  }
+}
+
 
 function getPropVal(o, prop, default_val=null) {
   try {
@@ -107,7 +122,7 @@ function getPropVal(o, prop, default_val=null) {
 function getNIVI(o) {
   return getPropVal(o, "name")
     || getPropVal(o,"identifier")
-    || getPropVal(t, "headline") 
+    || getPropVal(o, "headline")
     || getPropVal(o,"@value")
     || getPropVal(o,"@id")
     || "";
@@ -143,6 +158,7 @@ export default class JsonLdBlock {
       this._types = null;
       this.validation = false;
       this.valid = -1;
+      this.show_source = false;
     }
   }
 
@@ -194,6 +210,63 @@ export default class JsonLdBlock {
     return "No validation report available.";
   }
 
+  get passFail() {
+    if (this._validation_framed === null) {
+      return "Validation pending...";
+    }
+    if (this.valid) {
+      return "Validation Passed";
+    }
+    return "Validation Failed";
+  }
+
+  get validationTitle() {
+    if (this._validation_framed === null) {
+      return "Pending...";
+    }
+    let ntests = this._validation_framed['sh:shapeCount'];
+    let napplied = this._validation_framed['sh:shapesApplied'];
+    let nfail = this._validation_framed['sh:failureCount'];
+    if (this.valid) {
+      return `${napplied} / ${ntests} tests applied.`;
+    }
+    return `${nfail} errors. ${napplied} / ${ntests} tests applied.`;
+  }
+
+  get validationErrors() {
+    function verr(r) {
+      let e = {
+        severity: '',
+        message: ''
+      };
+      switch (r['sh:resultSeverity']['@id']) {
+        case 'sh:Violation': e.severity = 'Violation'; break;
+        case 'sh:Warning': e.severity = 'Warning'; break;
+        case 'sh:Info': e.severity = 'Information'; break;
+        default: e.severity = 'Error';
+      }
+      if (r['sh:resultMessage'] === null) {
+        e.message = ''
+      } else {
+        e.message = r['sh:resultMessage']['@value'];
+      }
+      return e
+    }
+
+    let res = [];
+    if (this._validation_framed === null) {
+      return res;
+    }
+    if (Array.isArray(this._validation_framed['sh:result'])) {
+      for (var i=0; i < this._validation_framed['sh:result'].length; i++) {
+        res.push(verr(this._validation_framed['sh:result'][i]));
+      }
+    } else {
+      res.push(verr(this._validation_framed['sh:result']));
+    }
+    return res;
+  }
+
   get dataText() {
     if (this._parse_error !== null) {
       return this._text;
@@ -219,7 +292,16 @@ export default class JsonLdBlock {
     if (this._parse_error !== null) {
       return 0;
     }
-    return this._dataset_framed["@graph"].length;
+    let typelist = [];
+    getTypes(this.compact['@graph'], typelist);
+    let nds = 0;
+    for (var i=0; i<typelist.length; i++) {
+      if (validation_types.includes(typelist[i])){
+        nds += 1;
+      }
+    }
+    return nds;
+    //return this._dataset_framed["@graph"].length;
   }
 
   get genericFrame() {

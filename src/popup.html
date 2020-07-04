@@ -12,7 +12,7 @@
   <div id="jsonld_sources" class="column col-12" x-bind:ticker="_ticker">
     <template x-for="g in blocks">
       <div class="card">
-        <div class="card-header">
+        <div class="card-header c-hand" x-on:click="toggleSource(g.global_block_id)">
           <template x-for="t in g.basicInfo">
             <div>
             <span class="chip" x-text="t.type"></span>
@@ -21,13 +21,31 @@
           </template>
         </div>
         <div class="card-body"><!-- White space matters in the following line since it is a pre block -->
-          <pre class="code" data-lang="JSON-LD"><span x-bind:id="g.global_block_id + '_copy'" class="c-hand" title="Copy JSON-LD to clipboard"><i class="icon icon-copy text-dark"></i> Copy</span>&nbsp;&nbsp;<span x-bind:id="g.global_block_id + '_edit'" class="c-hand" title="Open JSON-LD in Tangram editor"><i class="icon icon-share text-dark"></i> Edit</span>&nbsp;&nbsp;<a x-show="g.validation" x-bind:href="'#' + g.global_block_id + '_report'"><span x-bind:id="g.global_block_id + '_valid'" class="c-hand" title="Validation report" x-bind:class="{'text-gray':g.valid<0, 'text-success':g.valid==1,'text-error':g.valid==0}"><i class="icon" x-bind:class="{'icon-cross':g.valid<1, 'icon-check':g.valid>=1}"></i> Validation</span></a>
-            <code x-bind:id="g.global_block_id" x-text="g.dataText"></code>
-          </pre>
-          <pre x-show="g.validation" x-bind:id="g.global_block_id + '_report'" class="code" data-lang="Validation source">
-            <code x-text="g.validationReport">Loading...
-            </code>
-          </pre>
+          <div x-show="g.validation">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td x-on:click="toggleSource(g.global_block_id, true); window.setTimeout(function(){let e = document.getElementById(g.global_block_id + '_report'); e.scrollIntoView();}, 100);"><span class="chip" x-bind:class="{'bg-gray':g.valid<0, 'bg-success':g.valid==1,'bg-error':g.valid==0}" x-text="g.passFail"></span></td>
+                  <td x-text="g.validationTitle"></td>
+                </tr>
+                <template x-for="err in g.validationErrors">
+                  <tr>
+                    <td x-text="err.severity" x-bind:class="{'text-error':err.severity=='Violation','text-warning':err.severity=='Warning'}"></td>
+                    <td x-text="err.message"></td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          <div x-show="g.show_source">
+            <pre class="code" data-lang="JSON-LD"><span x-bind:id="g.global_block_id + '_copy'" class="c-hand" title="Copy JSON-LD to clipboard"><i class="icon icon-copy text-dark"></i> Copy</span>&nbsp;&nbsp;<span x-bind:id="g.global_block_id + '_edit'" class="c-hand" title="Open JSON-LD in Tangram editor"><i class="icon icon-share text-dark"></i> Edit</span>&nbsp;&nbsp;
+              <code x-bind:id="g.global_block_id" x-text="g.dataText"></code>
+            </pre>
+            <pre x-show="g.validation" x-bind:id="g.global_block_id + '_report'" class="code" data-lang="Validation Report Source"><span x-bind:id="g.global_block_id + '_report_copy'" class="c-hand" title="Copy report JSON-LD to clipboard"><i class="icon icon-copy text-dark"></i> Copy</span>
+              <code x-text="g.validationReport">Loading...
+              </code>
+            </pre>
+          </div>
         </div>
       </div>
     </template>

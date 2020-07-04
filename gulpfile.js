@@ -16,7 +16,6 @@ export const paths = {
   styles: [
     'src/options.scss',
     'src/popup.scss',
-    'node_modules/codemirror/lib/codemirror.css',
     'node_modules/spectre.css/dist/spectre.css',
     'node_modules/spectre.css/dist/spectre-exp.css',
     'node_modules/spectre.css/dist/spectre-icons.css',
