@@ -31,7 +31,7 @@
                 <template x-for="err in g.validationErrors">
                   <tr>
                     <td x-text="err.severity" x-bind:class="{'text-error':err.severity=='Violation','text-warning':err.severity=='Warning'}"></td>
-                    <td x-text="err.message"></td>
+                    <td><span x-text="err.message"></span><br /><span x-text="err.path"></span></td>
                   </tr>
                 </template>
               </tbody>
@@ -67,4 +67,3 @@
 </div>
 </body>
 </html>
-

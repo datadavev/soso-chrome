@@ -69,7 +69,8 @@ const validation_report_frame = {
     "@type":"sh:ValidationResult",
     "sh:resultSeverity":{},
     "sh:resultMessage":{"@value":{},"@language":"en"},
-    "sh:focusNode":{}
+    "sh:focusNode":{},
+    "sh:resultPath":{}
   }]
 };
 
@@ -237,7 +238,8 @@ export default class JsonLdBlock {
     function verr(r) {
       let e = {
         severity: '',
-        message: ''
+        message: '',
+        path:''
       };
       switch (r['sh:resultSeverity']['@id']) {
         case 'sh:Violation': e.severity = 'Violation'; break;
@@ -249,6 +251,12 @@ export default class JsonLdBlock {
         e.message = ''
       } else {
         e.message = r['sh:resultMessage']['@value'];
+      }
+      if (r['sh:resultPath'] === null) {
+        e.path = ''
+      } else {
+        e.path = r['sh:resultPath']['@id'];
+        e.path = "Path: " + e.path.replace("SO:","http://schema.org/");
       }
       return e
     }

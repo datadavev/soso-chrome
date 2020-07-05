@@ -22,7 +22,7 @@ function copyTextToClipboard(text) {
   textArea.select();
   try {
     document.execCommand('copy');
-    Spectre.Toast.info("JSON-LD block copied to clipboard.",null,{timeout:1500});
+    Spectre.Toast.info("Text block copied to clipboard.",null,{timeout:1500});
   } catch(err) {
     console.log("Unable to copy validation report to clipboard.")
   }

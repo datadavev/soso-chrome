@@ -37,8 +37,7 @@ Initialize the configuration
 function doInitializeConfiguration(data) {
   var bootstrap_config = {
     '_id':'tangram_config',
-    //'service_url': data.service.url,
-    'service_url': "http://localhost:5000",
+    'service_url': data.service.url,
     'shacl_url': data.shacl.url,
     'report_format': 'json-ld',
     'external_report_window': false
@@ -64,7 +63,7 @@ function initializeConfiguration() {
     .then(data => doInitializeConfiguration(data))
     .then(console.debug("initializeConfiguration Complete"));
 }
-
+window.initializeConfiguration = initializeConfiguration;
 
 /*
   Retrieve the configuration from the local storage
@@ -75,7 +74,7 @@ async function getTangramConfig() {
   console.log("Got config: ",doc);
   return doc
 }
-window.getTangramConfig = getTangramConfig
+window.getTangramConfig = getTangramConfig;
 
 
 async function getShaclShape() {
