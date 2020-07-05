@@ -1,8 +1,8 @@
 {
-  "name": "Tangram",
+  "name": "Science on Schema.org",
   "version": "1.0.0",
-  "manifest_version": 3,
-  "description": "Apply Tangram to page",
+  "manifest_version": 2,
+  "description": "Evaluate JSON-LD resources for Science on Schema.org guidelines.",
   "author": "Dave Vieglais",
   "homepage_url": "https://github.com/datadavev/soso-chrome",
   "icons": {
@@ -18,7 +18,6 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://*/*","http://*/*"],
       "run_at": "document_idle",
       "js": ["content.js"]
     }
@@ -28,5 +27,5 @@
     "persistent": false
   },
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-  "permissions": ["tabs", "http://*/*", "https://*/*", "storage","webNavigation"]
+  "permissions": ["activeTab", "storage"]
 }
