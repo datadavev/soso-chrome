@@ -131,6 +131,7 @@ async function validateBlocks() {
   console.debug("content.js validateBlocks");
   const val_config = await browser.runtime.sendMessage({name:"get_validation_config"});
   const url = val_config.service_url + "verify";
+  console.debug("Config loaded:", val_config);
   for (var i=0; i < so_data_blocks.length; i++){
     if (so_data_blocks[i].validation) {
       if (!so_data_blocks[i]._validated) {

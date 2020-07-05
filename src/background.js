@@ -43,17 +43,6 @@ function doInitializeConfiguration(data) {
     'external_report_window': false
   };
   updateConfiguration(bootstrap_config);
-
-  return;
-  _config.put(bootstrap_config, function(err, result) {
-    if (!err) {
-      console.log('bootstrap configuration loaded')
-    } else {
-      if (err.status != 409) { //entry exists
-        console.log('Boostrap config unexpected status: ', err);
-      }
-    }
-  })
 }
 
 
@@ -70,7 +59,12 @@ window.initializeConfiguration = initializeConfiguration;
  */
 async function getTangramConfig() {
   console.log('getTangramConfig');
-  let doc = await _config.get('tangram_config');
+  let doc = {};
+  try {
+    doc = await _config.get('tangram_config');
+  } catch (e) {
+    console.error(e);
+  }
   console.log("Got config: ",doc);
   return doc
 }
