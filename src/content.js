@@ -79,7 +79,7 @@ function locationHashChanged(event) {
 
 // Watch for mutations to the document, to look for changes to the URL
 function documentMutations(mutation_list, observer) {
-  console.debug("DOCUMENT CHANGED");
+  //console.debug("DOCUMENT CHANGED");
   if (window.location.pathname !== window_location) {
     console.debug("mutation location href changed");
     window_location = window.location.pathname;

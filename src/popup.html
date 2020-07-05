@@ -41,8 +41,8 @@
             <pre class="code" data-lang="JSON-LD"><span x-bind:id="g.global_block_id + '_copy'" class="c-hand" title="Copy JSON-LD to clipboard"><i class="icon icon-copy text-dark"></i> Copy</span>&nbsp;&nbsp;<span x-bind:id="g.global_block_id + '_edit'" class="c-hand" title="Open JSON-LD in Tangram editor"><i class="icon icon-share text-dark"></i> Edit</span>&nbsp;&nbsp;
               <code x-bind:id="g.global_block_id" x-text="g.dataText"></code>
             </pre>
-            <pre x-show="g.validation" x-bind:id="g.global_block_id + '_report'" class="code" data-lang="Validation Report Source"><span x-bind:id="g.global_block_id + '_report_copy'" class="c-hand" title="Copy report JSON-LD to clipboard"><i class="icon icon-copy text-dark"></i> Copy</span>
-              <code x-text="g.validationReport">Loading...
+            <pre x-show="g.validation"  class="code" data-lang="Validation Report Source"><span x-bind:id="g.global_block_id + '_report_copy'" class="c-hand" title="Copy report JSON-LD to clipboard"><i class="icon icon-copy text-dark"></i> Copy</span>
+              <code x-bind:id="g.global_block_id + '_report'" x-text="g.validationReport">Loading...
               </code>
             </pre>
           </div>

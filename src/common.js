@@ -58,7 +58,8 @@ const dataset_frame = {
 const validation_report_frame = {
   "@context": {
     "sh": "http://www.w3.org/ns/shacl#",
-    "SO":"http://schema.org/"
+    "SO":"http://schema.org/",
+    "sh:result": {"@container": "@set"}
   },
   "@type":"sh:ValidationReport",
   "sh:conforms":{},

@@ -34,7 +34,7 @@ const bootstrap_configuration_url = "https://dave.vieglais.com/config/tangram/de
 /*
 Initialize the configuration
  */
-function doInitializeConfiguration(data) {
+async function doInitializeConfiguration(data) {
   var bootstrap_config = {
     '_id':'tangram_config',
     'service_url': data.service.url,
@@ -42,15 +42,14 @@ function doInitializeConfiguration(data) {
     'report_format': 'json-ld',
     'external_report_window': false
   };
-  updateConfiguration(bootstrap_config);
+  await updateConfiguration(bootstrap_config);
 }
 
 
-function initializeConfiguration() {
-  fetch(bootstrap_configuration_url)
-    .then(response => response.json())
-    .then(data => doInitializeConfiguration(data))
-    .then(console.debug("initializeConfiguration Complete"));
+async function initializeConfiguration() {
+  let response = await fetch(bootstrap_configuration_url);
+  let data = await response.json();
+  await doInitializeConfiguration(data);
 }
 window.initializeConfiguration = initializeConfiguration;
 
@@ -63,7 +62,7 @@ async function getTangramConfig() {
   try {
     doc = await _config.get('tangram_config');
   } catch (e) {
-    console.error(e);
+    console.info("No configuration, loading default");
   }
   console.log("Got config: ",doc);
   return doc
@@ -80,10 +79,10 @@ window.getShaclShape = getShaclShape;
 
 function shaclShapeLoader(){
     const shacl_ttl = new Blob([this.responseText], {type:'text/turtle'});
-    console.debug("Shacl text = ", this.responseText);
+    //console.debug("Shacl text = ", this.responseText);
     _config.get('tangram_config').then(function(doc){
       console.debug("config revision = ", doc._rev);
-      console.debug("turtle = ", shacl_ttl);
+      //console.debug("turtle = ", shacl_ttl);
       _config.putAttachment('tangram_config', 'shacl.ttl', doc._rev, shacl_ttl, 'text/turtle')
         .then(function(result){
           console.debug("Save attachment result = ", result);
