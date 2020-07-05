@@ -1,10 +1,10 @@
 {
   "name": "Tangram",
-  "version": "0.1.0",
-  "manifest_version": 2,
+  "version": "1.0.0",
+  "manifest_version": 3,
   "description": "Apply Tangram to page",
-  "author": "Dave",
-  "homepage_url": "https://github.com/datadavev/tangram",
+  "author": "Dave Vieglais",
+  "homepage_url": "https://github.com/datadavev/soso-chrome",
   "icons": {
     "128": "images/tangram_128.png"
   },
