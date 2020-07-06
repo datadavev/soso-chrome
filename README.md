@@ -1,6 +1,8 @@
-# tangram [![Build Status][travis-image]][travis-url]
+# tangram
 
 > Apply Tangram to page
+
+[![Alt text](https://img.youtube.com/vi/CxqB6HIiXPg/0.jpg)](https://www.youtube.com/watch?v=CxqB6HIiXPg)
 
 ## Install
 
