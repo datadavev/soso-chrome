@@ -2,7 +2,7 @@
 
 Chrome extension for evaluating [schema.org/Dataset](https://schema.org/Dataset) content against [Science-on-schema.org guidelines](https://science-on-schema.org/) using the Tangram service.
 
-[![Alt text](https://img.youtube.com/vi/CxqB6HIiXPg/0.jpg)](https://www.youtube.com/watch?v=CxqB6HIiXPg)
+[![Alt text](https://raw.githubusercontent.com/datadavev/soso-chrome/master/publish_assets/sshot-01.png)](https://www.youtube.com/watch?v=CxqB6HIiXPg)
 
 ## Installation
 
