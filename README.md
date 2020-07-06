@@ -1,13 +1,26 @@
-# tangram
+# SOSO-Chrome
 
-> Apply Tangram to page
+> Chrome extension for evaluating schema.org content using the Tangram service.
 
 [![Alt text](https://img.youtube.com/vi/CxqB6HIiXPg/0.jpg)](https://www.youtube.com/watch?v=CxqB6HIiXPg)
 
-## Install
+## Installation
 
-#### [Chrome extension]()
-#### [Firefox add-on]()
+Note: This early release has **only** been tested on MacOS 10.15 with a recent version of Chrome.
+
+1. Download the SOSO-chrome.zip file from the [releases page](https://github.com/datadavev/soso-chrome/releases) and unzip it in a folder
+
+2. Visit [chrome://extensions/](chrome://extensions/)
+
+3. Turn on developer mode
+
+4. Click on "Load unpacked" and navigate to the directory where you unzipped the .zip
+
+5. Soso-chrome (aka Tangram) should appear in the toolbar. If not then:
+
+6. "pin" the extension by clicking on the jigsaw like piece to the right of the omnibar, then locate the "Science on schema.org" extension and click on the pin.
+
+
 
 ## Development
 
@@ -25,6 +38,4 @@
 - `yarn bundle` to compile the files and put them in a `.zip`, ready to be published.
 
 
-[travis-image]: https://travis-ci.org/datadavev/tangram.svg?branch=master
-[travis-url]: https://travis-ci.org/datadavev/tangram
 
