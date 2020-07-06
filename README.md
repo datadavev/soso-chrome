@@ -1,6 +1,6 @@
 # SOSO-Chrome
 
-> Chrome extension for evaluating schema.org content using the Tangram service.
+Chrome extension for evaluating schema.org Dataset content against [Science-on-schema.org guidelines](https://science-on-schema.org/) using the Tangram service.
 
 [![Alt text](https://img.youtube.com/vi/CxqB6HIiXPg/0.jpg)](https://www.youtube.com/watch?v=CxqB6HIiXPg)
 
