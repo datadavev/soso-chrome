@@ -1,11 +1,11 @@
 {
-  "name": "tangram",
-  "version": "0.0.0",
+  "name": "SOSO-chrome",
+  "version": "1.0.2",
   "description": "Apply Tangram to page",
   "license": "MIT",
   "repository": "https://github.com/datadavev/tangram",
   "author": {
-    "name": "Dave",
+    "name": "Dave Vieglais",
     "email": "datadavev@users.noreply.github.com",
     "url": ""
   },
