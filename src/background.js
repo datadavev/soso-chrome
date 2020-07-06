@@ -147,6 +147,14 @@ async function openJsonLDEditor(eid, text) {
   //inp.value = new Blob([text], {type:"application/ld+json"});
   inp.value = text;
   form.appendChild(inp);
+  inp = document.createElement('input');
+  inp.id = "sg";
+  inp.type = "hidden";
+  inp.name = "sg";
+  //inp.value = new Blob([text], {type:"application/ld+json"});
+  let shacl = await getShaclShape();
+  inp.value = await shacl.text();
+  form.appendChild(inp);
   document.body.appendChild(form);
   console.debug("Opening window ", win_name);
   var win = window.open('', win_name);
