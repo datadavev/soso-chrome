@@ -10,7 +10,7 @@ Note: This early release has **only** been tested on MacOS 10.15 with a recent v
 
 1. Download the SOSO-chrome.zip file from the [releases page](https://github.com/datadavev/soso-chrome/releases) and unzip it in a folder
 
-2. Visit [chrome://extensions/](chrome://extensions/)
+2. Visit `chrome://extensions/` in your chrome browser.
 
 3. Turn on developer mode
 
