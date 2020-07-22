@@ -1,6 +1,7 @@
 import jsonld from "jsonld";
 
-const SCHEMA_ORG_CONTEXT_DOC = "https://schema.org/version/latest/schema.jsonld";
+const SCHEMA_ORG_CONTEXT_DOC = "https://schema.org/docs/jsonldcontext.jsonld";
+const SCHEMA_ORG_VOCABULARY_DOC = "https://schema.org/version/latest/schemaorg-current-http.jsonld";
 const NS_SCHEMA_ORG = 'http://schema.org/';
 const RDF_TYPE='http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
 const schema_org_any_match = /^http(s?):\/\/schema\.org/gi;
@@ -20,7 +21,7 @@ const validation_types = [
 */
 const schema_org_compact = {
   "@context":[
-    SCHEMA_ORG_CONTEXT_DOC,
+    SCHEMA_ORG_VOCABULARY_DOC,
     {
       "@vocab": NS_SCHEMA_ORG
     }

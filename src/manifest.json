@@ -1,6 +1,6 @@
 {
   "name": "Science on Schema.org",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "manifest_version": 2,
   "description": "Evaluate JSON-LD resources for Science on Schema.org guidelines.",
   "author": "Dave Vieglais",
