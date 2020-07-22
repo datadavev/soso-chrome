@@ -2,7 +2,7 @@
 
 Chrome extension for evaluating [schema.org/Dataset](https://schema.org/Dataset) content against [Science-on-schema.org guidelines](https://science-on-schema.org/) using the Tangram service.
 
-[![Alt text](https://img.youtube.com/vi/CxqB6HIiXPg/0.jpg)](https://www.youtube.com/watch?v=CxqB6HIiXPg)
+[![Alt text](https://i.imgur.com/EEOW5TR.gif)](https://www.youtube.com/watch?v=CxqB6HIiXPg)
 
 ## Installation
 
@@ -10,7 +10,7 @@ Note: This early release has **only** been tested on MacOS 10.15 with a recent v
 
 1. Download the SOSO-chrome.zip file from the [releases page](https://github.com/datadavev/soso-chrome/releases) and unzip it in a folder
 
-2. Visit [chrome://extensions/](chrome://extensions/)
+2. Visit `chrome://extensions/` in your chrome browser.
 
 3. Turn on developer mode
 
