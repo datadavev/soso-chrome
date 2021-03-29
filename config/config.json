@@ -1,0 +1,10 @@
+{
+    "service": {
+      "url": "https://ti921zid2b.execute-api.us-east-1.amazonaws.com/dev",
+      "last_modified": "2020-07-06T13:57:13.357+0000"
+    },
+    "shacl": {
+      "url": "https://raw.githubusercontent.com/ESIPFed/science-on-schema.org/master/validation/shapegraphs/soso_common_v1.2.2.ttl",
+      "last_modified": "2020-07-04T14:42:52.010+0000"
+    }
+  }
