@@ -60,7 +60,7 @@
     "postcss-preset-env": "^6.5.0",
     "puppeteer": "^1.19.0",
     "sass-module-importer": "^1.4.0",
-    "socket.io": "^2.2.0",
+    "socket.io": "^2.4.0",
     "socket.io-client": "^2.2.0",
     "stylelint": "^10.1.0",
     "stylelint-config-rational-order": "^0.1.2",
