@@ -1225,7 +1225,7 @@ ajv@^6.1.0, ajv@^6.10.2, ajv@^6.12.3, ajv@^6.12.4, ajv@^6.9.1:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-alpinejs@^2.3.3:
+alpinejs@^2.8.2:
   version "2.8.2"
   resolved "https://registry.yarnpkg.com/alpinejs/-/alpinejs-2.8.2.tgz#b14ec21ae3cd78dcee4aed0a78ed0f01b676dac4"
   integrity sha512-5yOUtckn4CBp0qsHpo2qgjZyZit84uXvHbB7NJ27sn4FA6UlFl2i9PGUAdTXkcbFvvxDJBM+zpOD8RuNYFvQAw==
