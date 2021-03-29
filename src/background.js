@@ -29,7 +29,7 @@ const color_ok = '#00AA55';   //has dataset, no issues, validated
 
 export var cb_setJsonLD = null;
 
-const bootstrap_configuration_url = "https://dave.vieglais.com/config/tangram/dev-config.json";
+const bootstrap_configuration_url = "https://datadavev.github.io/config/tangram/dev-config.json";
 
 /*
 Initialize the configuration

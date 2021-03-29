@@ -1,7 +1,8 @@
 import browser from 'webextension-polyfill';
 import Alpine from 'alpinejs';
 import JsonLdBlock from 'common';
-import Spectre from "../../tangram/src/web/static/lib/spectre.js";
+//import Spectre from "../../tangram/src/web/static/lib/spectre.js";
+import Spectre from "spectre.css-js";
 
 function copyTextToClipboard(text) {
   var textArea = document.createElement("textarea");
