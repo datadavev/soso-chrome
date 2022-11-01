@@ -30,7 +30,7 @@
     "codemirror": "^5.52.2",
     "core-js": "^3.6.5",
     "css-loader": "^3.5.2",
-    "jsonld": "^3.1.1",
+    "jsonld": "^8.1.0",
     "lz-string": "^1.4.4",
     "pouchdb": "^7.2.1",
     "spectre.css": "^0.5.8",
